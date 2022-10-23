@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>Buyer</title>
+</head>
+<body>
+    <h1>Buyers Details</h1>
+    <form>
+        <label for="Name">First name:</label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="Email">Email address</label><br>
+        <input type="email" id="email" name="lname"><br>
+        <label for="Address">Delievry Address</label><br>
+        <textarea name="address" id="address" cols="30" rows="10"></textarea>
+    </form>
+
+    <h2>Add Product details You want to Purchase</h2>
+    <label for="Product Name"> Product Name :</label><br>
+    <input type="text" id="pname" name="Product Name"><br>
+    <label for="Product quantity"> Product quantity :</label><br>
+    <input type="text" id="p_quantity" name="Product quantity"><br><br>
+    <button onclick="set_values()">Get Quotation</button>
+
+
+</body>
+<script
+        src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.js"
+        type="application/javascript"
+></script>
+
+
+<script>
+        
+  let BuyerContract;
+  let signer;
+  let provider;
+  let accounts;
+  let BuyerContractABI;
+  let BuyerContractAddress; 
+
+  function get_values()
+  {
+      var buyerName = document.getElementById("name").value;
+      var buyerEmail = document.getElementById("email").value;
+      var buyerAddress = document.getElementById("address").value;
+      var productName = document.getElementById("pname").value;
+      var productQuantity = document.getElementById("p_quantity").value;
+      return (buyerName,buyerEmail,buyerAddress,productName,productQuantity);
+  }
+  
+ 
+  function set_details()
+  {
+    details=BuyerContract.methods.addBuyer(buyerName,buyerEmail,buyerAddress).call();
+    cosole.log(set_details());
+
+  }
+
+  function product_details()
+  {
+    details=BuyerContract.methods.addProduct(productName,productQuantity).call();
+    cosole.log(set_details());
+
+  }
+
+
+
+  async function doInitMetamask() {
+  BuyerContractAddress = "0x782ad2063101669D7644eD8B404402E3337c74be";
+  BuyerContractABI =   [
+    {
+      "inputs": [],
+      "stateMutability": "payable",
+      "type": "constructor",
+      "payable": true
+    },
+    {
+      "inputs": [],
+      "name": "buyer_address",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "buyers",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "email",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "delivery_addr",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "products",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "product_name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "quantity",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_email",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_delivery_addr",
+          "type": "string"
+        }
+      ],
+      "name": "addBuyer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_quantity",
+          "type": "uint256"
+        }
+      ],
+      "name": "addProduct",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "send",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
+    }
+  ]
+
+            provider = new ethers.providers.Web3Provider(web3.currentProvider);
+
+            try {
+                await provider.send("eth_requestAccounts", []);
+            } catch {
+                console.log("Connection error");
+            }
+
+            accounts = await provider.listAccounts();
+            console.log(accounts);
+            
+            signer = await provider.getSigner(accounts[0]);
+            console.log(signer);
+
+            console.log(BuyerContractAddress);
+            console.log(BuyerContractABI);
+            
+            MultiSigContract = new ethers.Contract( BuyerContractAddress, BuyerContractABI, signer);
+        }
+        doInitMetamask();
+
+
+        
+
+      
+
+      </script>
+
+
+</html>
